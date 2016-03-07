@@ -2,21 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import sys, re
-from urllib import request
-
-def get_charset(header):
-    match = re.search(r'charset=([^\s;]+)', header)
-
-    if match:
-        return match.group(1).strip('"\'').lower()
-    else:
-        return 'utf-8'
-
+import requests
 
 def get_html(link):
-    with request.urlopen(link) as url:
-        charset = get_charset(url.getheader('content-type'))
-        return url.read().decode(charset)
+    session = requests.Session()
+    session.headers['User-Agent'] = 'Mozilla/5.0'
+    resp = session.get(link)
+    html = resp.text
+
+    return html
 
 def clear_html(html):
     p = re.compile(r'style=".*?"')
@@ -25,7 +19,6 @@ def clear_html(html):
 if __name__ == '__main__':
     # Use:
     #   link - argument command line 1
-    #   get_charset - return encoding type
     #   get_html (link) - return original html for link
     #   clear_html (html) - return clear html without attributes 'style'
     #   python3 ./clear_html.py http://testdomain.com
